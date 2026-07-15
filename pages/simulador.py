@@ -1,11 +1,10 @@
-"""Página 2 — Simulador de Impacto no Consumo."""
+"""Simulador de Impacto no Consumo."""
 
 import streamlit as st
 import pandas as pd
 
 from src.api import (
     BANDEIRA_CORES,
-    BANDEIRA_EMOJI,
     bandeira_atual,
     fetch_bandeiras,
     impacto_mensal,
@@ -15,15 +14,6 @@ from src.charts import (
     impacto_historico,
     impacto_mensal_medio,
 )
-from src.style import inject_css, page_footer, sidebar_footer
-
-st.set_page_config(page_title="Simulador de Impacto — Bandeiras", page_icon="💰", layout="wide")
-inject_css()
-
-with st.sidebar:
-    st.markdown("## 💰 Simulador de Impacto")
-    st.caption("Calcule o impacto das bandeiras no seu consumo.")
-    sidebar_footer()
 
 
 @st.cache_data(ttl=3600, show_spinner=False)
@@ -41,7 +31,6 @@ with st.spinner("Carregando dados..."):
 nome_band, custo_mwh, custo_kwh, data_ref = bandeira_atual(df)
 cor_atual = BANDEIRA_CORES.get(nome_band, "#888")
 
-# ── Header ───────────────────────────────────────────────────────────────────
 st.markdown("# 💰 Simulador de Impacto no Consumo")
 st.markdown(
     "Informe o consumo médio mensal da sua unidade consumidora para calcular "
@@ -112,7 +101,6 @@ st.divider()
 # ── Cálculo de impacto ───────────────────────────────────────────────────────
 df_impacto = impacto_mensal(df, consumo_mensal)
 
-# ── KPIs de impacto ──────────────────────────────────────────────────────────
 st.markdown("### Impacto Atual")
 
 impacto_atual = custo_kwh * consumo_mensal[data_ref.month - 1]
@@ -161,7 +149,6 @@ with k4:
 
 st.markdown("")
 
-# ── Contexto ACL ─────────────────────────────────────────────────────────────
 if consumo_medio >= 500:
     custo_anual_medio = (
         df_impacto.groupby("ano")["impacto_rs"].sum().mean()
@@ -176,7 +163,6 @@ if consumo_medio >= 500:
 
 st.divider()
 
-# ── Gráficos de impacto ─────────────────────────────────────────────────────
 st.markdown("### Análise Histórica do Impacto")
 
 tab1, tab2, tab3 = st.tabs(["📊 Acumulado por Ano", "🗓️ Sazonalidade", "📈 Timeline"])
@@ -190,7 +176,6 @@ with tab2:
 with tab3:
     st.plotly_chart(impacto_historico(df_impacto), use_container_width=True)
 
-# ── Tabela detalhada ─────────────────────────────────────────────────────────
 with st.expander("📋 Tabela detalhada de impacto", expanded=False):
     tabela = (
         df_impacto[["data", "bandeira", "adicional_kwh", "consumo_kwh", "impacto_rs"]]
@@ -205,5 +190,3 @@ with st.expander("📋 Tabela detalhada de impacto", expanded=False):
         .reset_index(drop=True)
     )
     st.dataframe(tabela, use_container_width=True, height=400)
-
-page_footer()

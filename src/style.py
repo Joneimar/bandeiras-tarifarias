@@ -73,15 +73,6 @@ CUSTOM_CSS = """
     .page-footer a { color: #3b82f6; text-decoration: none; }
     .page-footer a:hover { text-decoration: underline; }
 
-    /* Renomeia "app" → "Página Inicial" na sidebar */
-    [data-testid="stSidebarNav"] li:first-child span {
-        font-size: 0;
-        line-height: 0;
-    }
-    [data-testid="stSidebarNav"] li:first-child span::after {
-        content: "Página Inicial";
-        font-size: 0.875rem;
-    }
 </style>
 """
 

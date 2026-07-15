@@ -1,4 +1,4 @@
-"""Página 1 — Dashboard de Bandeiras Tarifárias."""
+"""Dashboard de Bandeiras Tarifárias."""
 
 import streamlit as st
 import pandas as pd
@@ -17,15 +17,6 @@ from src.charts import (
     heatmap_mensal,
     timeline_bandeiras,
 )
-from src.style import inject_css, page_footer, sidebar_footer
-
-st.set_page_config(page_title="Dashboard — Bandeiras Tarifárias", page_icon="📊", layout="wide")
-inject_css()
-
-with st.sidebar:
-    st.markdown("## 📊 Dashboard")
-    st.caption("Análise histórica das bandeiras tarifárias.")
-    sidebar_footer()
 
 
 @st.cache_data(ttl=3600, show_spinner=False)
@@ -43,9 +34,7 @@ with st.spinner("Buscando dados na API da ANEEL..."):
 nome_bandeira, custo_mwh, custo_kwh, data_ref = bandeira_atual(df)
 cor_atual = BANDEIRA_CORES.get(nome_bandeira, "#888")
 
-# ── Header ───────────────────────────────────────────────────────────────────
 st.markdown("# 📊 Dashboard — Bandeiras Tarifárias")
-
 st.divider()
 
 # ── KPIs ─────────────────────────────────────────────────────────────────────
@@ -84,7 +73,6 @@ with k3:
 
 st.markdown("")
 
-# ── Filtro ───────────────────────────────────────────────────────────────────
 with st.expander("🔍 Filtrar período", expanded=False):
     sel_anos = st.slider("Intervalo de anos", ano_min, ano_max, (ano_min, ano_max))
     df_f = df[(df["ano"] >= sel_anos[0]) & (df["ano"] <= sel_anos[1])]
@@ -111,7 +99,6 @@ with tab2:
     st.plotly_chart(heatmap_mensal(df_f), use_container_width=True)
     st.plotly_chart(timeline_bandeiras(df_f), use_container_width=True)
 
-# ── Tabela ───────────────────────────────────────────────────────────────────
 with st.expander("📋 Tabela de dados completa", expanded=False):
     st.dataframe(
         df_f[["data", "bandeira", "adicional_mwh", "adicional_kwh"]]
@@ -126,5 +113,3 @@ with st.expander("📋 Tabela de dados completa", expanded=False):
         use_container_width=True,
         height=400,
     )
-
-page_footer()

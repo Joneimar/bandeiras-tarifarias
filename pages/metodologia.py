@@ -1,21 +1,10 @@
-"""Página 3 — Dados e Metodologia."""
+"""Dados e Metodologia."""
 
 import streamlit as st
-
-from src.style import inject_css, page_footer, sidebar_footer
-
-st.set_page_config(page_title="Dados e Metodologia — Bandeiras", page_icon="📋", layout="wide")
-inject_css()
-
-with st.sidebar:
-    st.markdown("## 📋 Dados e Metodologia")
-    st.caption("Fonte de dados, pipeline e referências.")
-    sidebar_footer()
 
 st.markdown("# 📋 Dados e Metodologia")
 st.divider()
 
-# ── Fonte de dados ───────────────────────────────────────────────────────────
 st.markdown("## Fonte de Dados")
 
 st.markdown("""
@@ -37,7 +26,6 @@ st.markdown("""
 
 st.divider()
 
-# ── Pipeline ETL ─────────────────────────────────────────────────────────────
 st.markdown("## Pipeline ETL")
 
 st.markdown("""
@@ -87,29 +75,28 @@ with c4:
 
 st.divider()
 
-# ── Estrutura do código ──────────────────────────────────────────────────────
 st.markdown("## Estrutura do Projeto")
 
 st.code("""
 bandeiras-tarifarias/
-├── app.py                              # Página inicial (Sobre)
+├── app.py                         # Entrypoint — navegação entre páginas
 ├── pages/
-│   ├── 1_Dashboard.py                 # Dashboard com gráficos
-│   ├── 2_Simulador_de_Impacto.py      # Simulador de custo
-│   └── 3_Dados_e_Metodologia.py       # Esta página
+│   ├── pagina_inicial.py          # Sobre o sistema de bandeiras
+│   ├── dashboard.py               # Dashboard com gráficos
+│   ├── simulador.py               # Simulador de custo
+│   └── metodologia.py             # Esta página
 ├── src/
-│   ├── api.py                          # Consumo da API ANEEL + transformações
-│   ├── charts.py                       # Gráficos Plotly
-│   └── style.py                        # Estilos CSS compartilhados
+│   ├── api.py                     # Consumo da API ANEEL + transformações
+│   ├── charts.py                  # Gráficos Plotly
+│   └── style.py                   # Estilos CSS compartilhados
 ├── .streamlit/
-│   └── config.toml                     # Tema escuro fixo
+│   └── config.toml                # Tema escuro fixo
 ├── requirements.txt
 └── README.md
 """, language="text")
 
 st.divider()
 
-# ── Tecnologias ──────────────────────────────────────────────────────────────
 st.markdown("## Tecnologias")
 
 st.markdown("""
@@ -124,7 +111,6 @@ st.markdown("""
 
 st.divider()
 
-# ── Bandeiras ────────────────────────────────────────────────────────────────
 st.markdown("## Referência das Bandeiras")
 
 st.markdown("""
@@ -139,7 +125,6 @@ st.markdown("""
 
 st.divider()
 
-# ── Referências regulatórias ─────────────────────────────────────────────────
 st.markdown("## Referências Regulatórias")
 
 st.markdown("""
@@ -160,5 +145,3 @@ st.markdown("""
 - **API de Dados Abertos da ANEEL** — [dadosabertos.aneel.gov.br](https://dadosabertos.aneel.gov.br/)
   — Portal público com datasets acessíveis via API CKAN.
 """)
-
-page_footer()
