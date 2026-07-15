@@ -96,7 +96,7 @@ with c3:
 
 st.markdown("")
 st.info(
-    "👈 **Navegue pelas páginas** usando o menu lateral para acessar o Dashboard, "
+    "**Navegue pelas páginas** para acessar o Dashboard, "
     "o Simulador de Impacto ou os Dados e Metodologia.",
     icon="💡",
 )
