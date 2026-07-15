@@ -4,13 +4,12 @@ Orquestra a navegação entre páginas e aplica configurações globais.
 """
 
 import streamlit as st
-from src.style import inject_css, page_footer, sidebar_footer
+from src.style import inject_css, page_footer
 
 st.set_page_config(
     page_title="Bandeiras Tarifárias — Setor Elétrico",
     page_icon="⚡",
     layout="wide",
-    initial_sidebar_state="expanded",
 )
 
 inject_css()
@@ -22,11 +21,7 @@ pages = [
     st.Page("pages/metodologia.py", title="Dados e Metodologia", icon="📋"),
 ]
 
-nav = st.navigation(pages)
-
-with st.sidebar:
-    sidebar_footer()
-
+nav = st.navigation(pages, position="top")
 nav.run()
 
 page_footer()
