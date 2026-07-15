@@ -76,7 +76,7 @@ if perfil == "Personalizado":
 
     edited = st.data_editor(
         consumo_df,
-        use_container_width=True,
+        width="stretch",
         hide_index=True,
         column_config={
             "Mês": st.column_config.TextColumn("Mês", disabled=True, width="small"),
@@ -168,13 +168,13 @@ st.markdown("### Análise Histórica do Impacto")
 tab1, tab2, tab3 = st.tabs(["📊 Acumulado por Ano", "🗓️ Sazonalidade", "📈 Timeline"])
 
 with tab1:
-    st.plotly_chart(impacto_anual_acumulado(df_impacto), use_container_width=True)
+    st.plotly_chart(impacto_anual_acumulado(df_impacto), width="stretch")
 
 with tab2:
-    st.plotly_chart(impacto_mensal_medio(df_impacto), use_container_width=True)
+    st.plotly_chart(impacto_mensal_medio(df_impacto), width="stretch")
 
 with tab3:
-    st.plotly_chart(impacto_historico(df_impacto), use_container_width=True)
+    st.plotly_chart(impacto_historico(df_impacto), width="stretch")
 
 with st.expander("📋 Tabela detalhada de impacto", expanded=False):
     tabela = (
@@ -189,4 +189,4 @@ with st.expander("📋 Tabela detalhada de impacto", expanded=False):
         .sort_values("Data", ascending=False)
         .reset_index(drop=True)
     )
-    st.dataframe(tabela, use_container_width=True, height=400)
+    st.dataframe(tabela, width="stretch", height=400)

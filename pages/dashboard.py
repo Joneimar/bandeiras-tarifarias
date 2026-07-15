@@ -86,18 +86,18 @@ with tab1:
     with c1:
         st.plotly_chart(
             distribuicao_bandeiras(resumo_por_bandeira(df_f)),
-            use_container_width=True,
+            width="stretch",
         )
     with c2:
         st.plotly_chart(
             custo_medio_por_ano(custo_medio_anual(df_f)),
-            use_container_width=True,
+            width="stretch",
         )
 
 with tab2:
-    st.plotly_chart(bandeira_por_ano_empilhado(df_f), use_container_width=True)
-    st.plotly_chart(heatmap_mensal(df_f), use_container_width=True)
-    st.plotly_chart(timeline_bandeiras(df_f), use_container_width=True)
+    st.plotly_chart(bandeira_por_ano_empilhado(df_f), width="stretch")
+    st.plotly_chart(heatmap_mensal(df_f), width="stretch")
+    st.plotly_chart(timeline_bandeiras(df_f), width="stretch")
 
 with st.expander("📋 Tabela de dados completa", expanded=False):
     st.dataframe(
@@ -110,6 +110,6 @@ with st.expander("📋 Tabela de dados completa", expanded=False):
         })
         .sort_values("Data", ascending=False)
         .reset_index(drop=True),
-        use_container_width=True,
+        width="stretch",
         height=400,
     )
