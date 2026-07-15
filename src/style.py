@@ -8,12 +8,15 @@ CUSTOM_CSS = """
     [data-testid="stSidebar"] { background-color: #141418; }
     [data-testid="stHeader"] { background-color: rgba(15,15,19,0.95); }
 
-    [data-testid="stSidebar"] [data-testid="stSidebarContent"] {
-        display: flex;
-        flex-direction: column;
-        height: 100%;
+    .sidebar-footer {
+        position: fixed;
+        bottom: 1rem;
+        font-size: 0.8rem;
+        color: #71717a;
+        line-height: 1.6;
     }
-    .sidebar-push { flex: 1; }
+    .sidebar-footer a { color: #3b82f6; text-decoration: none; }
+    .sidebar-footer a:hover { text-decoration: underline; }
 
     .kpi-card {
         padding: 1.25rem;
@@ -83,12 +86,13 @@ def inject_css():
 
 
 def sidebar_footer():
-    """Rodapé da sidebar empurrado para o fundo."""
-    st.markdown('<div class="sidebar-push"></div>', unsafe_allow_html=True)
-    st.markdown("---")
-    st.caption(
-        "Desenvolvido por [Joneimar Lemos](https://energycode.com.br)  \n"
-        "Dados: [ANEEL — Dados Abertos](https://dadosabertos.aneel.gov.br/)"
+    """Rodapé fixo no fundo da sidebar."""
+    st.markdown(
+        '<div class="sidebar-footer">'
+        'Desenvolvido por <a href="https://energycode.com.br">Joneimar Lemos</a><br>'
+        'Dados: <a href="https://dadosabertos.aneel.gov.br/">ANEEL — Dados Abertos</a>'
+        '</div>',
+        unsafe_allow_html=True,
     )
 
 
