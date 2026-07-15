@@ -17,7 +17,7 @@ from src.charts import (
     heatmap_mensal,
     timeline_bandeiras,
 )
-from src.style import inject_css, sidebar_footer
+from src.style import inject_css, page_footer, sidebar_footer
 
 st.set_page_config(page_title="Dashboard — Bandeiras Tarifárias", page_icon="📊", layout="wide")
 inject_css()
@@ -91,11 +91,9 @@ with st.expander("🔍 Filtrar período", expanded=False):
     st.caption(f"{len(df_f)} meses no período selecionado ({sel_anos[0]}–{sel_anos[1]})")
 
 # ── Gráficos ─────────────────────────────────────────────────────────────────
-tab1, tab2, tab3 = st.tabs(["📈 Visão Geral", "🗓️ Análise Temporal", "📊 Distribuição"])
+tab1, tab2 = st.tabs(["📈 Visão Geral", "🗓️ Análise Temporal"])
 
 with tab1:
-    st.plotly_chart(timeline_bandeiras(df_f), use_container_width=True)
-
     c1, c2 = st.columns(2)
     with c1:
         st.plotly_chart(
@@ -109,44 +107,24 @@ with tab1:
         )
 
 with tab2:
-    st.plotly_chart(heatmap_mensal(df_f), use_container_width=True)
     st.plotly_chart(bandeira_por_ano_empilhado(df_f), use_container_width=True)
+    st.plotly_chart(heatmap_mensal(df_f), use_container_width=True)
+    st.plotly_chart(timeline_bandeiras(df_f), use_container_width=True)
 
-with tab3:
-    resumo = resumo_por_bandeira(df_f)
+# ── Tabela ───────────────────────────────────────────────────────────────────
+with st.expander("📋 Tabela de dados completa", expanded=False):
+    st.dataframe(
+        df_f[["data", "bandeira", "adicional_mwh", "adicional_kwh"]]
+        .rename(columns={
+            "data": "Data",
+            "bandeira": "Bandeira",
+            "adicional_mwh": "Adicional (R$/MWh)",
+            "adicional_kwh": "Adicional (R$/kWh)",
+        })
+        .sort_values("Data", ascending=False)
+        .reset_index(drop=True),
+        use_container_width=True,
+        height=400,
+    )
 
-    st.markdown("#### Resumo por Tipo de Bandeira")
-    for _, row in resumo.iterrows():
-        cor = BANDEIRA_CORES.get(row["bandeira"], "#888")
-        st.markdown(f"""
-        <div style="display:flex; align-items:center; gap:1rem; padding:0.75rem 1rem;
-                    border-radius:8px; border:1px solid #2a2a32; background:#18181c; margin-bottom:0.5rem;">
-            <div style="width:14px; height:14px; border-radius:50%; background:{cor}; flex-shrink:0;"></div>
-            <div style="flex:1;">
-                <strong>{row['bandeira']}</strong>
-            </div>
-            <div style="color:#a1a1aa;">
-                {int(row['meses'])} meses ({row['percentual']}%)
-            </div>
-            <div style="width:120px; background:#2a2a32; border-radius:4px; height:8px;">
-                <div style="width:{row['percentual']}%; background:{cor}; border-radius:4px; height:100%;"></div>
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
-
-    st.markdown("")
-
-    with st.expander("📋 Tabela de dados completa", expanded=False):
-        st.dataframe(
-            df_f[["data", "bandeira", "adicional_mwh", "adicional_kwh"]]
-            .rename(columns={
-                "data": "Data",
-                "bandeira": "Bandeira",
-                "adicional_mwh": "Adicional (R$/MWh)",
-                "adicional_kwh": "Adicional (R$/kWh)",
-            })
-            .sort_values("Data", ascending=False)
-            .reset_index(drop=True),
-            use_container_width=True,
-            height=400,
-        )
+page_footer()

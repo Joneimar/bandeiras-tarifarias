@@ -8,6 +8,13 @@ CUSTOM_CSS = """
     [data-testid="stSidebar"] { background-color: #141418; }
     [data-testid="stHeader"] { background-color: rgba(15,15,19,0.95); }
 
+    [data-testid="stSidebar"] [data-testid="stSidebarContent"] {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+    .sidebar-push { flex: 1; }
+
     .kpi-card {
         padding: 1.25rem;
         border-radius: 12px;
@@ -40,15 +47,6 @@ CUSTOM_CSS = """
         font-size: 0.9rem;
         color: #fff;
     }
-    .info-box {
-        padding: 1.25rem;
-        border-radius: 10px;
-        border: 1px solid #2a2a32;
-        background: #18181c;
-        font-size: 0.9rem;
-        color: #d4d4d8;
-        line-height: 1.7;
-    }
     .feature-card {
         padding: 1.5rem;
         border-radius: 12px;
@@ -66,6 +64,24 @@ CUSTOM_CSS = """
         font-size: 0.9rem;
         line-height: 1.5;
     }
+    .page-footer {
+        text-align: center;
+        color: #71717a;
+        font-size: 0.85rem;
+        padding: 1rem 0;
+    }
+    .page-footer a { color: #3b82f6; text-decoration: none; }
+    .page-footer a:hover { text-decoration: underline; }
+
+    /* Renomeia "app" → "Página Inicial" na sidebar */
+    [data-testid="stSidebarNav"] li:first-child span {
+        font-size: 0;
+        line-height: 0;
+    }
+    [data-testid="stSidebarNav"] li:first-child span::after {
+        content: "Página Inicial";
+        font-size: 0.875rem;
+    }
 </style>
 """
 
@@ -76,9 +92,22 @@ def inject_css():
 
 
 def sidebar_footer():
-    """Rodapé padrão da sidebar."""
+    """Rodapé da sidebar empurrado para o fundo."""
+    st.markdown('<div class="sidebar-push"></div>', unsafe_allow_html=True)
     st.markdown("---")
-    st.markdown(
+    st.caption(
         "Desenvolvido por [Joneimar Lemos](https://energycode.com.br)  \n"
         "Dados: [ANEEL — Dados Abertos](https://dadosabertos.aneel.gov.br/)"
+    )
+
+
+def page_footer():
+    """Rodapé centralizado para o final de cada página."""
+    st.divider()
+    st.markdown(
+        '<div class="page-footer">'
+        '⚡ Bandeiras Tarifárias · Desenvolvido por Joneimar Lemos · '
+        '<a href="https://energycode.com.br" target="_blank">energycode.com.br</a>'
+        '</div>',
+        unsafe_allow_html=True,
     )

@@ -15,7 +15,7 @@ from src.charts import (
     impacto_historico,
     impacto_mensal_medio,
 )
-from src.style import inject_css, sidebar_footer
+from src.style import inject_css, page_footer, sidebar_footer
 
 st.set_page_config(page_title="Simulador de Impacto — Bandeiras", page_icon="💰", layout="wide")
 inject_css()
@@ -45,8 +45,7 @@ cor_atual = BANDEIRA_CORES.get(nome_band, "#888")
 st.markdown("# 💰 Simulador de Impacto no Consumo")
 st.markdown(
     "Informe o consumo médio mensal da sua unidade consumidora para calcular "
-    "o impacto financeiro histórico das bandeiras tarifárias. "
-    "Ideal para consumidores do **Grupo A** avaliando migração para o **Mercado Livre de Energia (ACL)**."
+    "o impacto financeiro histórico das bandeiras tarifárias."
 )
 
 st.divider()
@@ -77,35 +76,35 @@ MESES = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "
 
 if perfil == "Personalizado":
     defaults = [50000] * 12
+
+    st.markdown("#### Consumo mensal (kWh)")
+    st.caption("Ajuste os valores para cada mês.")
+
+    consumo_df = pd.DataFrame({
+        "Mês": MESES,
+        "Consumo (kWh)": defaults,
+    })
+
+    edited = st.data_editor(
+        consumo_df,
+        use_container_width=True,
+        hide_index=True,
+        column_config={
+            "Mês": st.column_config.TextColumn("Mês", disabled=True, width="small"),
+            "Consumo (kWh)": st.column_config.NumberColumn(
+                "Consumo (kWh)",
+                min_value=0,
+                max_value=10_000_000,
+                step=100,
+                format="%d",
+            ),
+        },
+        num_rows="fixed",
+    )
+    consumo_mensal = edited["Consumo (kWh)"].tolist()
 else:
-    defaults = PERFIS_DEFAULT[perfil]
+    consumo_mensal = PERFIS_DEFAULT[perfil]
 
-st.markdown("#### Consumo mensal (kWh)")
-st.caption("Ajuste os valores para cada mês ou use o perfil selecionado.")
-
-consumo_df = pd.DataFrame({
-    "Mês": MESES,
-    "Consumo (kWh)": defaults,
-})
-
-edited = st.data_editor(
-    consumo_df,
-    use_container_width=True,
-    hide_index=True,
-    column_config={
-        "Mês": st.column_config.TextColumn("Mês", disabled=True, width="small"),
-        "Consumo (kWh)": st.column_config.NumberColumn(
-            "Consumo (kWh)",
-            min_value=0,
-            max_value=10_000_000,
-            step=100,
-            format="%d",
-        ),
-    },
-    num_rows="fixed",
-)
-
-consumo_mensal = edited["Consumo (kWh)"].tolist()
 consumo_medio = sum(consumo_mensal) / 12
 
 st.divider()
@@ -170,8 +169,8 @@ if consumo_medio >= 500:
     st.success(
         f"💡 Com um consumo médio de **{consumo_medio:,.0f} kWh/mês**, sua unidade consumidora "
         f"paga em média **R$ {custo_anual_medio:,.2f}/ano** em adicionais de bandeiras tarifárias. "
-        f"No **Mercado Livre de Energia (ACL)**, esse custo não existe — o que pode representar "
-        f"uma economia significativa na conta de energia.",
+        f"No **Ambiente de Contratação Livre (ACL)**, esse custo não existe — o que pode representar "
+        f"maior previsibilidade e economia na conta de energia.",
         icon="⚡",
     )
 
@@ -180,16 +179,16 @@ st.divider()
 # ── Gráficos de impacto ─────────────────────────────────────────────────────
 st.markdown("### Análise Histórica do Impacto")
 
-tab1, tab2, tab3 = st.tabs(["📈 Timeline", "📊 Acumulado por Ano", "🗓️ Sazonalidade"])
+tab1, tab2, tab3 = st.tabs(["📊 Acumulado por Ano", "🗓️ Sazonalidade", "📈 Timeline"])
 
 with tab1:
-    st.plotly_chart(impacto_historico(df_impacto), use_container_width=True)
-
-with tab2:
     st.plotly_chart(impacto_anual_acumulado(df_impacto), use_container_width=True)
 
-with tab3:
+with tab2:
     st.plotly_chart(impacto_mensal_medio(df_impacto), use_container_width=True)
+
+with tab3:
+    st.plotly_chart(impacto_historico(df_impacto), use_container_width=True)
 
 # ── Tabela detalhada ─────────────────────────────────────────────────────────
 with st.expander("📋 Tabela detalhada de impacto", expanded=False):
@@ -206,3 +205,5 @@ with st.expander("📋 Tabela detalhada de impacto", expanded=False):
         .reset_index(drop=True)
     )
     st.dataframe(tabela, use_container_width=True, height=400)
+
+page_footer()

@@ -1,4 +1,4 @@
-"""Bandeiras Tarifárias — Página inicial (Sobre).
+"""Bandeiras Tarifárias — Página Inicial.
 
 Apresentação do sistema de bandeiras tarifárias e guia de uso do app.
 """
@@ -13,7 +13,7 @@ st.set_page_config(
 )
 
 from src.api import BANDEIRA_CORES, BANDEIRA_EMOJI, BANDEIRA_ORDEM
-from src.style import inject_css, sidebar_footer
+from src.style import inject_css, page_footer, sidebar_footer
 
 inject_css()
 
@@ -49,18 +49,17 @@ st.markdown("")
 
 cols = st.columns(5)
 bandeira_info = {
-    "Verde": "Condições favoráveis de geração. **Sem acréscimo** na tarifa.",
-    "Amarela": "Condições menos favoráveis. Acréscimo **moderado** na tarifa.",
-    "Vermelha P1": "Condições desfavoráveis. Acréscimo **elevado** — acionamento de térmicas.",
-    "Vermelha P2": "Condições muito desfavoráveis. Acréscimo **alto** — custo intensivo de geração.",
-    "Escassez Hídrica": "Crise hídrica severa (criada em 2021). Acréscimo **emergencial**.",
+    "Verde": "Condições favoráveis de geração. <b>Sem acréscimo</b> na tarifa.",
+    "Amarela": "Condições menos favoráveis. Acréscimo <b>moderado</b> na tarifa.",
+    "Vermelha P1": "Condições desfavoráveis. Acréscimo <b>elevado</b> — acionamento de térmicas.",
+    "Vermelha P2": "Condições muito desfavoráveis. Acréscimo <b>alto</b> — custo intensivo de geração.",
+    "Escassez Hídrica": "Crise hídrica severa (criada em 2021). Acréscimo <b>emergencial</b>.",
 }
 
 for i, bandeira in enumerate(BANDEIRA_ORDEM):
     with cols[i]:
         cor = BANDEIRA_CORES[bandeira]
         emoji = BANDEIRA_EMOJI[bandeira]
-        nome_curto = bandeira.replace("Escassez Hídrica", "Escassez<br>Hídrica")
         st.markdown(f"""
         <div class="feature-card" style="text-align:center; border-top: 3px solid {cor};">
             <h4 style="font-size:1.5rem; margin-bottom:0.3rem;">{emoji}</h4>
@@ -95,7 +94,7 @@ with c1:
     <div class="feature-card">
         <h4>📊 Dashboard</h4>
         <p>Visualize o histórico completo de bandeiras desde 2015 com gráficos interativos:
-        timeline, distribuição, heatmap, custo médio anual e composição por ano.</p>
+        timeline, heatmap, custo médio anual e composição por ano.</p>
     </div>
     """, unsafe_allow_html=True)
 
@@ -104,7 +103,7 @@ with c2:
     <div class="feature-card">
         <h4>💰 Simulador de Impacto</h4>
         <p>Informe o consumo mensal da sua unidade consumidora e veja o impacto financeiro
-        histórico das bandeiras. Ideal para análise de viabilidade de migração ao ACL.</p>
+        histórico das bandeiras tarifárias sobre o seu consumo.</p>
     </div>
     """, unsafe_allow_html=True)
 
@@ -124,5 +123,4 @@ st.info(
     icon="💡",
 )
 
-st.divider()
-st.caption("⚡ Bandeiras Tarifárias · Desenvolvido por Joneimar Lemos · [energycode.com.br](https://energycode.com.br)")
+page_footer()

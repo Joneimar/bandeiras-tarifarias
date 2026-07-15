@@ -2,7 +2,7 @@
 
 import streamlit as st
 
-from src.style import inject_css, sidebar_footer
+from src.style import inject_css, page_footer, sidebar_footer
 
 st.set_page_config(page_title="Dados e Metodologia — Bandeiras", page_icon="📋", layout="wide")
 inject_css()
@@ -94,9 +94,9 @@ st.code("""
 bandeiras-tarifarias/
 ├── app.py                              # Página inicial (Sobre)
 ├── pages/
-│   ├── 1_📊_Dashboard.py              # Dashboard com gráficos
-│   ├── 2_💰_Simulador_de_Impacto.py   # Simulador de custo
-│   └── 3_📋_Dados_e_Metodologia.py    # Esta página
+│   ├── 1_Dashboard.py                 # Dashboard com gráficos
+│   ├── 2_Simulador_de_Impacto.py      # Simulador de custo
+│   └── 3_Dados_e_Metodologia.py       # Esta página
 ├── src/
 │   ├── api.py                          # Consumo da API ANEEL + transformações
 │   ├── charts.py                       # Gráficos Plotly
@@ -161,5 +161,4 @@ st.markdown("""
   — Portal público com datasets acessíveis via API CKAN.
 """)
 
-st.divider()
-st.caption("⚡ Bandeiras Tarifárias · Desenvolvido por Joneimar Lemos · [energycode.com.br](https://energycode.com.br)")
+page_footer()

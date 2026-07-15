@@ -96,42 +96,38 @@ def distribuicao_bandeiras(resumo: pd.DataFrame) -> go.Figure:
 
 
 def custo_medio_por_ano(custo_anual: pd.DataFrame) -> go.Figure:
-    """Barras horizontais do custo médio por ano.
+    """Barras verticais do custo médio por ano.
 
-    Valores zero recebem uma barra mínima visível com anotação.
+    Valores zero recebem anotação visível.
     """
     custo = custo_anual.sort_values("ano").copy()
+    anos_str = custo["ano"].astype(str)
 
-    y_display = custo["custo_medio"].apply(lambda v: max(v, 0.8))
-    zeros = custo[custo["custo_medio"] == 0]
+    cores = [
+        "#22c55e" if v == 0 else "#3b82f6"
+        for v in custo["custo_medio"]
+    ]
+
+    display_vals = custo["custo_medio"].apply(lambda v: max(v, 1.0))
 
     fig = go.Figure(go.Bar(
-        x=y_display,
-        y=custo["ano"].astype(str),
-        orientation="h",
-        marker_color="#3b82f6",
-        text=custo["custo_medio"].apply(lambda v: f"R$ {v:.2f}"),
+        x=anos_str,
+        y=display_vals,
+        marker_color=cores,
+        text=custo["custo_medio"].apply(
+            lambda v: "R$ 0 (Verde)" if v == 0 else f"R$ {v:.1f}"
+        ),
         textposition="outside",
-        hovertemplate="<b>%{y}</b><br>Custo médio: R$ %{customdata:.2f}/MWh<extra></extra>",
+        textfont=dict(size=10),
+        hovertemplate="<b>%{x}</b><br>Custo médio: R$ %{customdata:.2f}/MWh<extra></extra>",
         customdata=custo["custo_medio"],
     ))
-
-    for _, row in zeros.iterrows():
-        fig.add_annotation(
-            x=2.5,
-            y=str(int(row["ano"])),
-            text="R$ 0,00 (100% Verde)",
-            showarrow=False,
-            font=dict(size=11, color="#22c55e"),
-            xanchor="left",
-        )
 
     return _apply(
         fig,
         title="Custo Adicional Médio por Ano",
-        xaxis_title="R$/MWh",
-        yaxis_title="",
-        yaxis=dict(autorange="reversed"),
+        xaxis_title="",
+        yaxis_title="R$/MWh",
     )
 
 
