@@ -1,7 +1,6 @@
-"""Dashboard — Bandeiras Tarifárias do Sistema Elétrico Brasileiro.
+"""Bandeiras Tarifárias — Página inicial (Sobre).
 
-Dados consumidos em tempo real da API de Dados Abertos da ANEEL.
-Desenvolvido por Joneimar Lemos · energycode.com.br
+Apresentação do sistema de bandeiras tarifárias e guia de uso do app.
 """
 
 import streamlit as st
@@ -13,246 +12,117 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-import pandas as pd
+from src.api import BANDEIRA_CORES, BANDEIRA_EMOJI, BANDEIRA_ORDEM
+from src.style import inject_css, sidebar_footer
 
-from src.api import (
-    BANDEIRA_CORES,
-    bandeira_atual,
-    custo_medio_anual,
-    fetch_bandeiras,
-    resumo_por_bandeira,
-)
-from src.charts import (
-    bandeira_por_ano_empilhado,
-    custo_medio_por_ano,
-    distribuicao_bandeiras,
-    heatmap_mensal,
-    timeline_bandeiras,
-)
+inject_css()
 
-# ── Estilo customizado ──────────────────────────────────────────────────────
-st.markdown("""
-<style>
-    [data-testid="stAppViewContainer"] { background-color: #0f0f13; }
-    [data-testid="stSidebar"] { background-color: #141418; }
-    .kpi-card {
-        padding: 1.5rem;
-        border-radius: 12px;
-        border: 1px solid #2a2a32;
-        background: linear-gradient(135deg, #18181c 0%, #141418 100%);
-        text-align: center;
-    }
-    .kpi-label {
-        font-size: 0.85rem;
-        color: #a1a1aa;
-        text-transform: uppercase;
-        letter-spacing: 0.08em;
-        margin-bottom: 0.5rem;
-    }
-    .kpi-value {
-        font-size: 2rem;
-        font-weight: 700;
-        line-height: 1.2;
-    }
-    .kpi-sub {
-        font-size: 0.85rem;
-        color: #a1a1aa;
-        margin-top: 0.35rem;
-    }
-    .bandeira-badge {
-        display: inline-block;
-        padding: 0.3rem 1rem;
-        border-radius: 999px;
-        font-weight: 600;
-        font-size: 0.9rem;
-        color: #fff;
-    }
-    .info-box {
-        padding: 1.25rem;
-        border-radius: 10px;
-        border: 1px solid #2a2a32;
-        background: #18181c;
-        font-size: 0.9rem;
-        color: #d4d4d8;
-        line-height: 1.7;
-    }
-</style>
-""", unsafe_allow_html=True)
-
-
-@st.cache_data(ttl=3600, show_spinner=False)
-def load_data() -> pd.DataFrame:
-    return fetch_bandeiras()
-
-
-# ── Sidebar ──────────────────────────────────────────────────────────────────
 with st.sidebar:
     st.markdown("## ⚡ Bandeiras Tarifárias")
-    st.caption("Dados: [ANEEL — Dados Abertos](https://dadosabertos.aneel.gov.br/)")
+    st.caption("Navegue pelas páginas no menu acima.")
+    sidebar_footer()
 
-    st.markdown("---")
+# ── Hero ─────────────────────────────────────────────────────────────────────
+st.markdown("# ⚡ Bandeiras Tarifárias do Setor Elétrico Brasileiro")
+st.markdown(
+    "Dashboard analítico com dados em tempo real da **API de Dados Abertos da ANEEL** "
+    "para análise do histórico de bandeiras tarifárias, impacto no custo de energia "
+    "e simulação sobre o consumo."
+)
 
-    st.markdown("""
-    <div class="info-box">
-        <strong>O que são Bandeiras Tarifárias?</strong><br><br>
-        Sistema criado pela ANEEL em 2015 que sinaliza, mês a mês, o custo
-        real de geração de energia elétrica no Brasil.<br><br>
-        Quando os reservatórios estão cheios, a bandeira é
-        <strong style="color:#22c55e">Verde</strong> (sem acréscimo).
-        Em condições adversas, acionam-se as bandeiras
-        <strong style="color:#eab308">Amarela</strong>,
-        <strong style="color:#ef4444">Vermelha P1</strong>,
-        <strong style="color:#991b1b">Vermelha P2</strong> ou
-        <strong style="color:#7c3aed">Escassez Hídrica</strong>,
-        com acréscimos progressivos na conta de luz.
-    </div>
-    """, unsafe_allow_html=True)
+st.divider()
 
-    st.markdown("---")
-    st.markdown(
-        "Desenvolvido por [Joneimar Lemos](https://energycode.com.br)  \n"
-        "Dados atualizados via API da ANEEL"
-    )
+# ── O que são Bandeiras Tarifárias ───────────────────────────────────────────
+st.markdown("## O que são Bandeiras Tarifárias?")
 
+st.markdown("""
+O sistema de **Bandeiras Tarifárias** foi criado pela ANEEL (Agência Nacional de Energia Elétrica)
+e passou a vigorar em **janeiro de 2015**. Ele funciona como um sinal de preço que indica, mês a mês,
+o **custo real de geração de energia elétrica** no Brasil.
 
-# ── Carregamento dos dados ───────────────────────────────────────────────────
-with st.spinner("Buscando dados na API da ANEEL..."):
-    try:
-        df = load_data()
-    except Exception as e:
-        st.error(f"Não foi possível carregar os dados da ANEEL: {e}")
-        st.stop()
+Quando as condições de geração são favoráveis — reservatórios cheios e geração hidrelétrica abundante —
+a bandeira é **Verde** e não há acréscimo na conta. Quando as condições são adversas e é necessário
+acionar usinas termelétricas (mais caras), bandeiras de maior custo são acionadas.
+""")
 
-nome_bandeira, custo_mwh, custo_kwh, data_ref = bandeira_atual(df)
-resumo = resumo_por_bandeira(df)
-custo_anual = custo_medio_anual(df)
+st.markdown("")
 
-# ── Header ───────────────────────────────────────────────────────────────────
-st.markdown("# ⚡ Dashboard — Bandeiras Tarifárias")
-st.markdown("Análise do histórico de bandeiras tarifárias do Sistema Elétrico Brasileiro, "
-            "com dados em tempo real da API de Dados Abertos da ANEEL.")
+cols = st.columns(5)
+bandeira_info = {
+    "Verde": "Condições favoráveis de geração. **Sem acréscimo** na tarifa.",
+    "Amarela": "Condições menos favoráveis. Acréscimo **moderado** na tarifa.",
+    "Vermelha P1": "Condições desfavoráveis. Acréscimo **elevado** — acionamento de térmicas.",
+    "Vermelha P2": "Condições muito desfavoráveis. Acréscimo **alto** — custo intensivo de geração.",
+    "Escassez Hídrica": "Crise hídrica severa (criada em 2021). Acréscimo **emergencial**.",
+}
 
-st.markdown("---")
-
-# ── KPIs ─────────────────────────────────────────────────────────────────────
-k1, k2, k3, k4 = st.columns(4)
-
-cor_atual = BANDEIRA_CORES.get(nome_bandeira, "#888")
-with k1:
-    st.markdown(f"""
-    <div class="kpi-card">
-        <div class="kpi-label">Bandeira Vigente</div>
-        <div class="kpi-value">
-            <span class="bandeira-badge" style="background:{cor_atual}">{nome_bandeira}</span>
+for i, bandeira in enumerate(BANDEIRA_ORDEM):
+    with cols[i]:
+        cor = BANDEIRA_CORES[bandeira]
+        emoji = BANDEIRA_EMOJI[bandeira]
+        nome_curto = bandeira.replace("Escassez Hídrica", "Escassez<br>Hídrica")
+        st.markdown(f"""
+        <div class="feature-card" style="text-align:center; border-top: 3px solid {cor};">
+            <h4 style="font-size:1.5rem; margin-bottom:0.3rem;">{emoji}</h4>
+            <h4 style="font-size:0.95rem;">{bandeira}</h4>
+            <p style="font-size:0.82rem;">{bandeira_info[bandeira]}</p>
         </div>
-        <div class="kpi-sub">Ref. {data_ref.strftime('%b/%Y')}</div>
+        """, unsafe_allow_html=True)
+
+st.markdown("")
+
+# ── Contexto regulatório ─────────────────────────────────────────────────────
+with st.expander("📜 Contexto Regulatório", expanded=False):
+    st.markdown("""
+    - **Resolução Normativa ANEEL nº 547/2013** — Instituiu o sistema de bandeiras tarifárias.
+    - **Janeiro de 2015** — Início da vigência do sistema.
+    - **Resolução ANEEL nº 2.939/2021** — Criou a bandeira de **Escassez Hídrica** para cobrir custos
+      do acionamento emergencial de térmicas durante a crise hídrica de 2021.
+    - O valor do adicional é definido mensalmente pela ANEEL e incide sobre cada kWh consumido
+      pelos consumidores cativos (conectados à distribuidora).
+    - Consumidores do **mercado livre de energia** não pagam bandeiras, mas estão expostos ao PLD.
+    """)
+
+st.divider()
+
+# ── Como usar o app ──────────────────────────────────────────────────────────
+st.markdown("## Como Usar este Dashboard")
+
+c1, c2, c3 = st.columns(3)
+
+with c1:
+    st.markdown("""
+    <div class="feature-card">
+        <h4>📊 Dashboard</h4>
+        <p>Visualize o histórico completo de bandeiras desde 2015 com gráficos interativos:
+        timeline, distribuição, heatmap, custo médio anual e composição por ano.</p>
     </div>
     """, unsafe_allow_html=True)
 
-with k2:
-    st.markdown(f"""
-    <div class="kpi-card">
-        <div class="kpi-label">Adicional Atual</div>
-        <div class="kpi-value" style="color:{cor_atual}">R$ {custo_mwh:.2f}</div>
-        <div class="kpi-sub">por MWh</div>
+with c2:
+    st.markdown("""
+    <div class="feature-card">
+        <h4>💰 Simulador de Impacto</h4>
+        <p>Informe o consumo mensal da sua unidade consumidora e veja o impacto financeiro
+        histórico das bandeiras. Ideal para análise de viabilidade de migração ao ACL.</p>
     </div>
     """, unsafe_allow_html=True)
 
-consumo_medio_kwh = 150
-custo_mensal = custo_kwh * consumo_medio_kwh
-with k3:
-    st.markdown(f"""
-    <div class="kpi-card">
-        <div class="kpi-label">Impacto Mensal Estimado</div>
-        <div class="kpi-value" style="color:{cor_atual}">R$ {custo_mensal:.2f}</div>
-        <div class="kpi-sub">consumo residencial de {consumo_medio_kwh} kWh</div>
-    </div>
-    """, unsafe_allow_html=True)
-
-total_meses = len(df)
-ano_min, ano_max = int(df["ano"].min()), int(df["ano"].max())
-with k4:
-    st.markdown(f"""
-    <div class="kpi-card">
-        <div class="kpi-label">Série Histórica</div>
-        <div class="kpi-value" style="color:#3b82f6">{total_meses} meses</div>
-        <div class="kpi-sub">{ano_min} – {ano_max}</div>
+with c3:
+    st.markdown("""
+    <div class="feature-card">
+        <h4>📋 Dados e Metodologia</h4>
+        <p>Detalhes sobre a fonte de dados (API ANEEL), pipeline ETL,
+        estrutura do código e referências regulatórias.</p>
     </div>
     """, unsafe_allow_html=True)
 
 st.markdown("")
+st.info(
+    "👈 **Navegue pelas páginas** usando o menu lateral para acessar o Dashboard, "
+    "o Simulador de Impacto ou os Dados e Metodologia.",
+    icon="💡",
+)
 
-# ── Filtro de período ────────────────────────────────────────────────────────
-with st.expander("🔍 Filtrar período", expanded=False):
-    sel_anos = st.slider("Selecione o intervalo de anos", ano_min, ano_max, (ano_min, ano_max))
-    df_filtrado = df[(df["ano"] >= sel_anos[0]) & (df["ano"] <= sel_anos[1])]
-    st.caption(f"{len(df_filtrado)} meses no período selecionado ({sel_anos[0]}–{sel_anos[1]})")
-
-# ── Gráficos principais ─────────────────────────────────────────────────────
-st.plotly_chart(timeline_bandeiras(df_filtrado), use_container_width=True)
-
-col_left, col_right = st.columns(2)
-
-with col_left:
-    st.plotly_chart(
-        distribuicao_bandeiras(resumo_por_bandeira(df_filtrado)),
-        use_container_width=True,
-    )
-
-with col_right:
-    st.plotly_chart(
-        custo_medio_por_ano(custo_medio_anual(df_filtrado)),
-        use_container_width=True,
-    )
-
-st.plotly_chart(heatmap_mensal(df_filtrado), use_container_width=True)
-
-st.plotly_chart(bandeira_por_ano_empilhado(df_filtrado), use_container_width=True)
-
-# ── Tabela de dados ──────────────────────────────────────────────────────────
-with st.expander("📋 Dados completos", expanded=False):
-    st.dataframe(
-        df_filtrado[["data", "bandeira", "adicional_mwh", "adicional_kwh"]]
-        .rename(columns={
-            "data": "Data",
-            "bandeira": "Bandeira",
-            "adicional_mwh": "Adicional (R$/MWh)",
-            "adicional_kwh": "Adicional (R$/kWh)",
-        })
-        .sort_values("Data", ascending=False)
-        .reset_index(drop=True),
-        use_container_width=True,
-        height=400,
-    )
-
-# ── Seção metodológica ───────────────────────────────────────────────────────
-st.markdown("---")
-st.markdown("### Sobre os Dados e a Metodologia")
-
-st.markdown("""
-**Fonte:** API de Dados Abertos da ANEEL — recurso
-[Bandeiras Tarifárias](https://dadosabertos.aneel.gov.br/dataset/bandeiras-tarifarias).
-
-**Pipeline de dados:**
-1. Requisição paginada ao endpoint `datastore_search` da API CKAN da ANEEL.
-2. Parsing e tipagem dos campos (`DatCompetencia` → datetime, `VlrAdicionalBandeira` → float em R$/MWh).
-3. Conversão R$/MWh → R$/kWh para cálculos de impacto no consumidor residencial.
-4. Cache de 1h via `st.cache_data` para otimizar re-renderizações sem sobrecarregar a API.
-
-**Bandeiras disponíveis:**
-| Bandeira | Condição | Acréscimo |
-|---|---|---|
-| 🟢 Verde | Condições favoráveis de geração | Sem acréscimo |
-| 🟡 Amarela | Condições menos favoráveis | Acréscimo moderado |
-| 🔴 Vermelha P1 | Condições desfavoráveis | Acréscimo elevado |
-| 🔴 Vermelha P2 | Condições muito desfavoráveis | Acréscimo alto |
-| 🟣 Escassez Hídrica | Crise hídrica severa (2021) | Acréscimo emergencial |
-
-**Contexto regulatório:** O sistema de bandeiras tarifárias foi instituído pela Resolução Normativa
-ANEEL nº 547/2013 e passou a vigorar em janeiro de 2015. A bandeira de Escassez Hídrica foi
-criada pela Resolução nº 2.939/2021 para cobrir custos do acionamento emergencial de térmicas
-durante a crise hídrica de 2021.
-""")
-
-st.markdown("---")
-st.caption("⚡ Dashboard de Bandeiras Tarifárias · Desenvolvido por Joneimar Lemos · energycode.com.br")
+st.divider()
+st.caption("⚡ Bandeiras Tarifárias · Desenvolvido por Joneimar Lemos · [energycode.com.br](https://energycode.com.br)")
